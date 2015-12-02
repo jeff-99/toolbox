@@ -1,0 +1,53 @@
+__author__ = 'jeff'
+from .plugin import ToolboxPlugin
+import importlib
+
+class NoPluginException (Exception):
+    pass
+
+class Registry(object):
+    """
+    Registry of all available plugins
+    """
+    _registered_plugins = {}
+
+    def add_plugin(self, plugin):
+        """
+        Add a ToolboxPlugin to the registry.
+         Instances of toolbox plugins need a name attribute for this to work
+
+        :param plugin:
+        :return:
+        """
+        if not isinstance(plugin , ToolboxPlugin):
+            raise NoPluginException('provided plugin argument is not does not extend the core ToolboxPlugin class')
+        if not hasattr(plugin, 'name') or plugin.name is None:
+            raise AttributeError('Plugin has no name attribute set')
+
+        self._registered_plugins[plugin.name] = plugin
+
+
+    def populate(self, modules):
+        """
+        Given a list of 'importable' modules populate the registry
+        :param modules:
+        :return:
+        """
+        for module in modules:
+            m = importlib.import_module(module)
+
+            if not hasattr(m,'Plugin'):
+                raise NoPluginException('Module: {} has no plugin set'.format(module))
+
+            self.add_plugin(m.Plugin)
+
+    def get_plugin_names(self):
+        return self._registered_plugins
+
+
+    def get_plugins(self):
+        """
+        :return: List of registered plugins
+        :rtype: list
+        """
+        return self._registered_plugins.values()
