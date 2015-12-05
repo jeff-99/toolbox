@@ -1,11 +1,11 @@
 __author__ = 'jeff'
 
 import argparse
-from toolbox import Registry
+from .registry import Registry
 from .scanner import find_contrib_modules, find_modules
 
 class Toolbox(object):
-    registry = Registry
+    registry = Registry()
     parser = argparse.ArgumentParser()
     
     def __init__(self, external=True,contrib=True):

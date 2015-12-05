@@ -1,5 +1,6 @@
 __author__ = 'jeff'
 from .plugin import ToolboxPlugin
+from .mixins import RegistryMixin
 import importlib
 
 class NoPluginException (Exception):
@@ -23,6 +24,9 @@ class Registry(object):
             raise NoPluginException('provided plugin argument is not does not extend the core ToolboxPlugin class')
         if not hasattr(plugin, 'name') or plugin.name is None:
             raise AttributeError('Plugin has no name attribute set')
+
+        if isinstance(plugin, RegistryMixin):
+            plugin.set_registry(self)
 
         self._registered_plugins[plugin.name] = plugin
 

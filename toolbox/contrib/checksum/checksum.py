@@ -1,8 +1,9 @@
-__author__ = 'jeff'
-from toolbox.plugin import ToolboxPlugin
 import hashlib
+from toolbox.plugin import ToolboxPlugin
+from toolbox.mixins import RegistryMixin
 
-class ChecksumPlugin(ToolboxPlugin):
+
+class ChecksumPlugin(RegistryMixin, ToolboxPlugin):
 
     name = 'checksum'
 
