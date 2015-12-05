@@ -1,9 +1,9 @@
 import hashlib
 from toolbox.plugin import ToolboxPlugin
-from toolbox.mixins import RegistryMixin
+from toolbox.mixins import RegistryMixin, ConfigMixin
 
 
-class ChecksumPlugin(RegistryMixin, ToolboxPlugin):
+class ChecksumPlugin(ConfigMixin,RegistryMixin, ToolboxPlugin):
 
     name = 'checksum'
 
@@ -14,6 +14,8 @@ class ChecksumPlugin(RegistryMixin, ToolboxPlugin):
         parser.set_defaults(method="sha1")
 
     def execute(self, args):
+        config = self.get_config()
+
         if args.file:
             with open(args.file,"rb") as inf:
                 data = inf.read()

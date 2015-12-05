@@ -3,10 +3,10 @@ __author__ = 'jeff'
 import argparse
 from .registry import Registry
 from .scanner import find_contrib_modules, find_modules
+from .config import ConfigManager
+from .mixins import ConfigMixin
 
 class Toolbox(object):
-    registry = Registry()
-    parser = argparse.ArgumentParser()
     
     def __init__(self, external=True,contrib=True):
 
@@ -15,6 +15,10 @@ class Toolbox(object):
             modules += find_contrib_modules()
         if external:
             modules += find_modules()
+
+        self.registry = Registry()
+        self.parser = argparse.ArgumentParser()
+        self.config_manager = ConfigManager()
 
         self.registry.populate(modules)
 
@@ -32,6 +36,11 @@ class Toolbox(object):
             # let the plugin prepare the arguments
             plugin.prepare_parser(plugin_parser)
 
+            if isinstance(plugin, ConfigMixin):
+                # @todo only load active plugin config ?
+                config = self.config_manager.load_plugin(plugin.name)
+                plugin.set_config(config)
+
     def execute(self, args):
         parsed_args = self.parser.parse_args(args)
 
@@ -45,4 +54,8 @@ class Toolbox(object):
         except Exception as e:
             print("Somehow the plugin did not do what it should have done!")
             print(e)
+
+    def shutdown(self):
+        #  @todo only save active config ?
+        self.config_manager.save(self.registry.get_plugins())
 
