@@ -22,10 +22,12 @@ class ConfigManager(object):
 
         self.config_dir = config_dir
 
+        # config plugin's config is global config
         self._settings_file = os.path.join(
                             os.path.expanduser('~'),
                             ConfigManager.TOOLBOX_DIR,
-                            'settings' + ConfigManager.FILE_EXT)
+                            ConfigManager.CONFIG_DIR,
+                            'config' + ConfigManager.FILE_EXT)
 
         if not os.path.exists(self._settings_file):
             with open(self._settings_file, 'w') as f:
