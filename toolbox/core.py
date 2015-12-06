@@ -24,7 +24,6 @@ class Toolbox(object):
         self._active_plugin = None
 
     def prepare(self):
-        self.parser.add_argument("--list",action="store_true",help="list all plugins")
         subparsers = self.parser.add_subparsers(help='Plugins', dest='plugin')
 
         for plugin in self.registry.get_plugins():
@@ -48,10 +47,6 @@ class Toolbox(object):
     def execute(self, args):
         parsed_args = self.parser.parse_args(args)
 
-        if parsed_args.list:
-            for n in self.registry.get_plugin_names():
-                print(n)
-            return
 
         if parsed_args.plugin is None:
             raise Exception('Plugin not set')

@@ -6,6 +6,7 @@ from toolbox.mixins import RegistryMixin, ConfigMixin
 class ChecksumPlugin(ConfigMixin,RegistryMixin, ToolboxPlugin):
 
     name = 'checksum'
+    description = 'Calculate or compare the checksum of a file'
 
     def prepare_parser(self, parser):
         parser.add_argument("-f","--file",help="file to get checksum of")

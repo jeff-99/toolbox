@@ -22,13 +22,14 @@ class BasePlugin(ToolboxPlugin):
     """
     An easy to use Plugin wrapper that sets all the necessary parts of a ToolboxPlugin
     """
-    def __init__(self,name = None, prepare_parser_func = None, execute_func = None):
+    def __init__(self,name = None, description = None, prepare_parser_func = None, execute_func = None):
         if not prepare_parser_func is None:
             self.set_prepare_parser(prepare_parser_func)
         if not execute_func is None:
             self.set_execute(execute_func)
 
         self.name = name
+        self.description = description
 
     def set_prepare_parser(self, prepare_parser_func):
         if hasattr(prepare_parser_func, '__call__'):
@@ -41,6 +42,9 @@ class BasePlugin(ToolboxPlugin):
             self.execute_func = execute_func
         else:
             raise NotCallableException("{} is not callable".format(execute_func))
+
+    def set_description(self,description):
+        self.description = description
 
     def prepare_parser(self, parser):
         try:

@@ -24,6 +24,8 @@ class Registry(object):
             raise NoPluginException('provided plugin argument is not does not extend the core ToolboxPlugin class')
         if not hasattr(plugin, 'name') or plugin.name is None:
             raise AttributeError('Plugin has no name attribute set')
+        if not hasattr(plugin, 'description') or plugin.description is None:
+            raise AttributeError("Plugin {} has no description".format(plugin.description))
 
         if isinstance(plugin, RegistryMixin):
             plugin.set_registry(self)
@@ -46,7 +48,7 @@ class Registry(object):
             self.add_plugin(m.Plugin)
 
     def get_plugin_names(self):
-        return self._registered_plugins
+        return self._registered_plugins.keys()
 
 
     def get_plugins(self):

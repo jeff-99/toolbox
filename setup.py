@@ -7,7 +7,7 @@ setup(
     url='http://github.com/jeff-99/toolbox',
     license='MIT',
     author='Jeff Slort',
-    install_requires=[],
+    install_requires=['terminaltables'],
     author_email='j_slort@hotmail.com',
     description='Pluggable toolbox',
     long_description="",
