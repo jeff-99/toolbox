@@ -55,3 +55,9 @@ class Registry(object):
         :rtype: list
         """
         return self._registered_plugins.values()
+
+    def get_plugin(self,name):
+        if name in self._registered_plugins:
+            return self._registered_plugins[name]
+
+        raise ValueError('the {} Plugin is not registered'.format(name))

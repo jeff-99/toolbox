@@ -21,10 +21,11 @@ class Toolbox(object):
         self.config_manager = ConfigManager()
 
         self.registry.populate(modules)
+        self._active_plugin = None
 
     def prepare(self):
         self.parser.add_argument("--list",action="store_true",help="list all plugins")
-        subparsers = self.parser.add_subparsers(help='Plugins')
+        subparsers = self.parser.add_subparsers(help='Plugins', dest='plugin')
 
         for plugin in self.registry.get_plugins():
             # create a new subparser for this plugin
@@ -36,10 +37,13 @@ class Toolbox(object):
             # let the plugin prepare the arguments
             plugin.prepare_parser(plugin_parser)
 
-            if isinstance(plugin, ConfigMixin):
-                # @todo only load active plugin config ?
-                config = self.config_manager.load_plugin(plugin.name)
-                plugin.set_config(config)
+
+    def _load_plugin(self, name):
+        plugin = self.registry.get_plugin(name)
+
+        if isinstance(plugin, ConfigMixin):
+            config = self.config_manager.load_plugin(plugin.name)
+            plugin.set_config(config)
 
     def execute(self, args):
         parsed_args = self.parser.parse_args(args)
@@ -49,6 +53,12 @@ class Toolbox(object):
                 print(n)
             return
 
+        if parsed_args.plugin is None:
+            raise Exception('Plugin not set')
+        else:
+            self._active_plugin = parsed_args.plugin
+            self._load_plugin(parsed_args.plugin)
+
         try:
             parsed_args.executable(parsed_args)
         except Exception as e:
@@ -56,6 +66,7 @@ class Toolbox(object):
             print(e)
 
     def shutdown(self):
-        #  @todo only save active config ?
-        self.config_manager.save(self.registry.get_plugins())
+        active_plugin = self.registry.get_plugin(self._active_plugin)
+        if isinstance(active_plugin, ConfigMixin):
+            self.config_manager.save_plugin(active_plugin.name, active_plugin.get_config())
 
