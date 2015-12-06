@@ -2,23 +2,28 @@ __author__ = 'jeff'
 
 import argparse
 from .registry import Registry
-from .scanner import find_contrib_modules, find_modules
+from .scanner import find_contrib_modules, find_modules, find_local_modules
 from .config import ConfigManager
 from .mixins import ConfigMixin
 
 class Toolbox(object):
     
-    def __init__(self, external=True,contrib=True):
+    def __init__(self, external=True,contrib=True,local=True):
+
+        self.config_manager = ConfigManager()
+        global_config = self.config_manager.get_global_config()
 
         modules = []
         if contrib:
             modules += find_contrib_modules()
         if external:
-            modules += find_modules()
+            modules += find_modules(global_config['toolbox_prefix'])
+        if local:
+            modules += find_local_modules(global_config['local_plugin_dir'])
+
 
         self.registry = Registry()
         self.parser = argparse.ArgumentParser()
-        self.config_manager = ConfigManager()
 
         self.registry.populate(modules)
         self._active_plugin = None
@@ -64,4 +69,6 @@ class Toolbox(object):
         active_plugin = self.registry.get_plugin(self._active_plugin)
         if isinstance(active_plugin, ConfigMixin):
             self.config_manager.save_plugin(active_plugin.name, active_plugin.get_config())
+
+        self.config_manager.save_global_config()
 
