@@ -1,9 +1,14 @@
 import sys
-from .core import Toolbox
+from .core import Toolbox, UnknownPlugin
 
 
 def main():
     t = Toolbox()
     t.prepare()
-    t.execute(sys.argv[1:])
+
+    try:
+        t.execute(sys.argv[1:])
+    except UnknownPlugin:
+        return
+
     t.shutdown()

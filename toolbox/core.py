@@ -5,6 +5,10 @@ from .config import ConfigManager
 from .mixins import ConfigMixin
 
 
+class UnknownPlugin(Exception):
+    pass
+
+
 class Toolbox(object):
     
     def __init__(self, external=True,contrib=True,local=True):
@@ -27,6 +31,11 @@ class Toolbox(object):
         self._active_plugin = None
 
     def prepare(self):
+        # prepare main parser
+        self.parser.usage = '%(prog)s tool [args]'
+        self.parser.description = 'Extendable plugin toolbox'
+
+        # prepare subparsers
         subparsers = self.parser.add_subparsers(help='Plugins', dest='plugin')
 
         for plugin in self.registry.get_plugins():
@@ -39,7 +48,6 @@ class Toolbox(object):
             # let the plugin prepare the arguments
             plugin.prepare_parser(plugin_parser)
 
-
     def _load_plugin(self, name):
         plugin = self.registry.get_plugin(name)
 
@@ -50,9 +58,9 @@ class Toolbox(object):
     def execute(self, args):
         parsed_args = self.parser.parse_args(args)
 
-
         if parsed_args.plugin is None:
-            raise Exception('Plugin not set')
+            self.parser.print_help()
+            raise UnknownPlugin('Plugin not set')
         else:
             self._active_plugin = parsed_args.plugin
             self._load_plugin(parsed_args.plugin)
