@@ -3,6 +3,7 @@ import os
 import json
 import collections
 from .mixins import ConfigMixin
+import copy
 
 class ConfigManager(object):
 
@@ -40,8 +41,10 @@ class ConfigManager(object):
         file_name = name + ConfigManager.FILE_EXT
         path = os.path.join(self.config_dir,file_name)
 
+        global_conf = self.get_global_config()
+
         if not os.path.exists(path):
-            return PluginConfig()
+            return global_conf
         elif os.path.exists(path) and not os.path.isfile(path):
             raise TypeError('{} is not a file'.format(path))
         else:
@@ -50,18 +53,20 @@ class ConfigManager(object):
                     config = json.load(f)
                     plugin_config = PluginConfig.create_from_dict(config)
 
-                    return plugin_config
+                    return merge_configs(global_conf , plugin_config)
                 except ValueError:
-                    return PluginConfig()
+                    return global_conf
 
     def save_plugin(self,name, config):
         file_name = name + ConfigManager.FILE_EXT
         path = os.path.join(self.config_dir,file_name)
 
+        global_conf = self.get_global_config()
+
         if os.path.exists(path) and not os.path.isfile(path):
             raise Exception('path exists but it ain\'t a file Brah')
 
-        self._save_config(path,config)
+        self._save_config(path, remove_config(config, global_conf))
 
     def save(self, plugins):
         for plugin in plugins:
@@ -77,6 +82,31 @@ class ConfigManager(object):
     def _save_config(self, fp, config):
         with open(fp, 'w') as f:
             f.write(config.to_json())
+
+    def merge_configs(base, *args):
+        """
+        Merge config with global configs
+        :param base:
+        :param args:
+        :return:
+        """
+        config = copy.deepcopy(base)
+        for c in args:
+            config = config + c
+        return config
+
+    def remove_config(base, *args):
+        """
+        Remove global config variables
+        :param base:
+        :param args:
+        :return:
+        """
+        config = copy.deepcopy(base)
+        for c in args:
+            config = config - c
+
+        return config
 
 
 class PluginConfig(object):
@@ -95,6 +125,33 @@ class PluginConfig(object):
 
     def __contains__(self, item):
         return item in self._config
+
+    def __add__(self, other):
+        if not isinstance(other, PluginConfig):
+            return self
+
+        for key in other.keys():
+            self[key] = other[key]
+
+        return self
+
+    def __sub__(self, other):
+        """
+        Remove the keys of the other config
+        :param other:
+        :return:
+        """
+        if self is other or not isinstance(other, PluginConfig):
+            return self
+
+        for key in other.keys():
+            if key in self:
+                del self[key]
+
+        return self
+
+    def keys(self):
+        return self._config.keys()
 
     def to_json(self):
         return json.dumps(self._config, indent=True)

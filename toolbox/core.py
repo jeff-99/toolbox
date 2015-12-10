@@ -52,6 +52,7 @@ class Toolbox(object):
         plugin = self.registry.get_plugin(name)
 
         if isinstance(plugin, ConfigMixin):
+
             config = self.config_manager.load_plugin(plugin.name)
             plugin.set_config(config)
 

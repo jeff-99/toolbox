@@ -12,5 +12,5 @@ setup(
     description='Pluggable toolbox',
     long_description="",
     packages=['toolbox','toolbox.contrib'],
-    entry_points = {'console_scripts': ['tbx = toolbox.cli:main']},
+    entry_points = {'console_scripts': ['tbox = toolbox.cli:main']},
 )

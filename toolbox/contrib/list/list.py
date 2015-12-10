@@ -15,7 +15,6 @@ class ListPlugin(RegistryMixin, ToolboxPlugin):
     def execute(self, args):
         registry = self.get_registry()
 
-
         data = []
         if args.external:
             for name in find_modules():
