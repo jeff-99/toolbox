@@ -53,7 +53,7 @@ class ConfigManager(object):
                     config = json.load(f)
                     plugin_config = PluginConfig.create_from_dict(config)
 
-                    return merge_configs(global_conf , plugin_config)
+                    return self.merge_configs(global_conf , plugin_config)
                 except ValueError:
                     return global_conf
 
@@ -66,7 +66,7 @@ class ConfigManager(object):
         if os.path.exists(path) and not os.path.isfile(path):
             raise Exception('path exists but it ain\'t a file Brah')
 
-        self._save_config(path, remove_config(config, global_conf))
+        self._save_config(path, self.remove_config(config, global_conf))
 
     def save(self, plugins):
         for plugin in plugins:
