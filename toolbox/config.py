@@ -1,9 +1,9 @@
-__author__ = 'jeff'
 import os
 import json
 import collections
 from .mixins import ConfigMixin
 import copy
+
 
 class ConfigManager(object):
 
@@ -32,7 +32,13 @@ class ConfigManager(object):
 
         if not os.path.exists(self._settings_file):
             with open(self._settings_file, 'w') as f:
-                json.dump({},f)
+                from .defaults import TOOLBOX_DIR, CONF_DIR, LOCAL_PLUGIN_DIR, TOOLBOX_PREFIX, EXT_PLUGINS
+                json.dump({
+                    'toolbox_dir' : TOOLBOX_DIR,
+                    'config_dir' : CONF_DIR,
+                    'local_plugin_dir' : LOCAL_PLUGIN_DIR,
+                    'toolbox_prefix' : TOOLBOX_PREFIX
+                },f)
 
         with open(self._settings_file, 'r') as f:
             self._global_config = PluginConfig.create_from_dict(json.load(f))
@@ -83,7 +89,7 @@ class ConfigManager(object):
         with open(fp, 'w') as f:
             f.write(config.to_json())
 
-    def merge_configs(base, *args):
+    def merge_configs(self,base, *args):
         """
         Merge config with global configs
         :param base:
@@ -95,7 +101,7 @@ class ConfigManager(object):
             config = config + c
         return config
 
-    def remove_config(base, *args):
+    def remove_config(self, base, *args):
         """
         Remove global config variables
         :param base:

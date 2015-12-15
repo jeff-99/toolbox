@@ -19,7 +19,6 @@ def find_contrib_modules():
 
 
 def find_local_modules(plugin_dir):
-    plugin_dir = os.path.join(os.path.expanduser('~'),'.toolbox', plugin_dir)
     if plugin_dir is None or not os.path.isdir(plugin_dir):
         return []
 
