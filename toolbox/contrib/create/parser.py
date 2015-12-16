@@ -1,6 +1,8 @@
 __author__ = 'jeff'
 import os
 import re
+from toolbox.cli \
+    import main
 
 class Parser(object):
     def __init__(self, template_dir, dest_dir, args):
@@ -18,8 +20,8 @@ class Parser(object):
                 name = self.args[key]
             except KeyError:
                 raise AttributeError('Template variable {} was not set in the provided args'.format(key))
-
-            line = re.sub(r'{{.*?}}', name,line,1)
+            key_pattern = r'{{(' + key + ')?}}'
+            line = re.sub(key_pattern, name,line,0)
 
         return line
 
@@ -33,7 +35,7 @@ class Parser(object):
             for line in data:
                 new_data.append(self._parse_line(line))
 
-        return "\n".join(new_data)
+        return "".join(new_data)
 
     def parse(self):
         dir_content = []

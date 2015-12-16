@@ -15,8 +15,8 @@ class CreatePlugin(ToolboxPlugin):
 
     def execute(self, args):
 
-        name = args.name.capitalize()
-        p = Parser(os.path.join(os.path.dirname(__file__), 'template'),args.dir,{'toolname':name})
+        name = args.name
+        p = Parser(os.path.join(os.path.dirname(__file__), 'template'),args.dir,{'toolname':name, 'toolclass':name.capitalize()})
 
         for (dir, files, file_contents) in p.parse():
             if not os.path.exists(dir):
