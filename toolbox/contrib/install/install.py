@@ -2,7 +2,7 @@ __author__ = 'jeff'
 
 from toolbox.plugin import ToolboxPlugin
 from toolbox.mixins import ConfigMixin
-import pip, re, os, shutil, inspect, importlib
+import pip, os, shutil, inspect, importlib
 
 class InstallPlugin (ConfigMixin, ToolboxPlugin):
 
