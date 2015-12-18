@@ -1,5 +1,6 @@
 __author__ = 'jeff'
 from abc import ABCMeta, abstractmethod, abstractproperty
+import subprocess, os
 
 class ToolboxPlugin(object):
     __metaclass__ = ABCMeta
@@ -62,3 +63,23 @@ class BasePlugin(ToolboxPlugin):
             pass
         except TypeError:
             pass
+
+
+class ExecutablePlugin(ToolboxPlugin):
+
+    name = None
+    description = None
+    executable = None
+    args = []
+
+    def prepare_parser(self, parser):
+        parser.add_argument('args', nargs="*")
+
+    def execute(self, args):
+        if self.executable is None:
+            raise ValueError('executable path can not be empty')
+
+        executable = os.path.abspath(self.executable) if os.path.exists(self.executable) else self.executable
+
+        command = [executable] + self.args + args.args
+        subprocess.call(command)
