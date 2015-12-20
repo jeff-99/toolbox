@@ -1,9 +1,9 @@
 from toolbox.plugin import ToolboxPlugin
 
-class {{toolclass}}Plugin (ToolboxPlugin):
+class {{toolname|c}}Plugin (ToolboxPlugin):
 
     name = "{{toolname}}"
-    description = "{{toolname}} is a plugin I created, yay!"
+    description = "{{toolname|c}} is a plugin I created, yay!"
 
     def prepare_parser(self, parser):
         pass

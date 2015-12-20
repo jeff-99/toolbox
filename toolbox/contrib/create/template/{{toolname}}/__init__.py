@@ -1,4 +1,3 @@
-from .{{toolname}} \
-import {{toolclass}}Plugin
+from .{{toolname}} import {{toolname|c}}Plugin
 
-Plugin = {{toolclass}}Plugin()
+Plugin = {{toolname|c}}Plugin()

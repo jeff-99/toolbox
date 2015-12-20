@@ -1,8 +1,7 @@
 __author__ = 'jeff'
 import os
 import re
-from toolbox.cli \
-    import main
+from .processor import ALIASES
 
 class Parser(object):
     def __init__(self, template_dir, dest_dir, args):
@@ -10,18 +9,27 @@ class Parser(object):
         self.dest_dir = dest_dir
         self.args = args
 
+    def resolve_key(self, match):
+        """
+        Resolve the matched key and process it's value based on the supplied processors
+        :param match:
+        :return:
+        :rtype: str
+        """
+        args = match.group(1).split('|')
+        key = args[0]
+        processor_funcs = args[1:]
+
+        value = self.args.get(key,'')
+        for func_name in processor_funcs:
+            # get processer func or use to string func
+            value = ALIASES.get(func_name,str)(value)
+
+        return value
+
     def _parse_line(self, line):
         pattern = r'{{(.*?)}}'
-
-        match = re.search(pattern,line)
-        if match is not None:
-            key = match.group(1)
-            try:
-                name = self.args[key]
-            except KeyError:
-                raise AttributeError('Template variable {} was not set in the provided args'.format(key))
-            key_pattern = r'{{(' + key + ')?}}'
-            line = re.sub(key_pattern, name,line,0)
+        line = re.sub(pattern,self.resolve_key, line)
 
         return line
 
