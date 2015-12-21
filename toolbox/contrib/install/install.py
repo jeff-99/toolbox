@@ -2,6 +2,7 @@ __author__ = 'jeff'
 
 from toolbox.plugin import ToolboxPlugin
 from toolbox.mixins import ConfigMixin
+from toolbox.scanner import find_local_modules
 import pip, os, shutil, inspect, importlib, hashlib
 
 class InstallPlugin (ConfigMixin, ToolboxPlugin):
@@ -47,8 +48,11 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
                     print('Installation of {} failed with : {}'.format(args.package,e))
 
 
-        # not a local dir let pip do the heavy lifting
+        elif command == 'uninstall' and args.package in find_local_modules(self.get_config()['local_plugin_dir']):
+            # uninstall local plugins by name
+            shutil.rmtree(os.path.join(self.get_config()['local_plugin_dir'], args.package))
         else:
+            # not a local dir let pip do the heavy lifting
             pip.main([command, args.package])
 
         # check if enable flag is set and if any of the installed packages contains the name of the module provided

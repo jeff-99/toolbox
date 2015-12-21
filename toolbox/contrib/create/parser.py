@@ -1,7 +1,7 @@
 __author__ = 'jeff'
 import os
 import re
-from .processor import ALIASES
+from .renderer import ALIASES
 
 class Parser(object):
     def __init__(self, template_dir, dest_dir, args):
@@ -11,7 +11,7 @@ class Parser(object):
 
     def resolve_key(self, match):
         """
-        Resolve the matched key and process it's value based on the supplied processors
+        Resolve the matched key and process it's value based on the supplied renderer
         :param match:
         :return:
         :rtype: str
@@ -22,7 +22,7 @@ class Parser(object):
 
         value = self.args.get(key,'')
         for func_name in processor_funcs:
-            # get processer func or use to string func
+            # get renderer func or use to string func
             value = ALIASES.get(func_name,str)(value)
 
         return value
