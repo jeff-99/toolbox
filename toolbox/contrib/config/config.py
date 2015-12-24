@@ -13,9 +13,13 @@ class ConfigPlugin (ConfigMixin, ToolboxPlugin):
         parser.add_argument('value', nargs='?')
 
     def execute(self, args):
-        config = self.get_config()
-
         if args.method == 'set' and not args.value is None:
-            config[args.attribute] = args.value
+            self.set(args.attribute, args.value)
         elif args.method == 'get':
-            print("Attribute {} is set to {}".format(args.attribute,config[args.attribute]))
+            print("Attribute {} is set to {}".format(args.attribute,self.get(args.attribute)))
+
+    def set(self, key, value):
+        self.get_config()[key] = value
+
+    def get(self, key):
+        return self.get_config()[key]

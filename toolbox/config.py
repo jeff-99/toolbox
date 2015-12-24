@@ -47,10 +47,8 @@ class ConfigManager(object):
         file_name = name + ConfigManager.FILE_EXT
         path = os.path.join(self.config_dir,file_name)
 
-        global_conf = self.get_global_config()
-
         if not os.path.exists(path):
-            return global_conf
+            plugin_config = PluginConfig()
         elif os.path.exists(path) and not os.path.isfile(path):
             raise TypeError('{} is not a file'.format(path))
         else:
@@ -59,20 +57,24 @@ class ConfigManager(object):
                     config = json.load(f)
                     plugin_config = PluginConfig.create_from_dict(config)
 
-                    return self.merge_configs(global_conf , plugin_config)
                 except ValueError:
-                    return global_conf
+                    plugin_config = PluginConfig()
+
+        global_conf = self.get_global_config()
+        plugin_config.set_global_config(global_conf)
+        return plugin_config
+
 
     def save_plugin(self,name, config):
         file_name = name + ConfigManager.FILE_EXT
         path = os.path.join(self.config_dir,file_name)
 
-        global_conf = self.get_global_config()
-
         if os.path.exists(path) and not os.path.isfile(path):
             raise Exception('path exists but it ain\'t a file Brah')
 
-        self._save_config(path, self.remove_config(config, global_conf))
+        del config[PluginConfig.GLOBAL_KEY]
+
+        self._save_config(path, config)
 
     def save(self, plugins):
         for plugin in plugins:
@@ -117,6 +119,8 @@ class ConfigManager(object):
 
 class PluginConfig(object):
 
+    GLOBAL_KEY = '__GLOBAL__'
+
     def __init__(self):
         self._config = collections.defaultdict(lambda: None)
 
@@ -155,6 +159,12 @@ class PluginConfig(object):
                 del self[key]
 
         return self
+
+    def set_global_config(self, config):
+        self[PluginConfig.GLOBAL_KEY] = config
+
+    def get_global_config(self):
+        return self[PluginConfig.GLOBAL_KEY]
 
     def keys(self):
         return self._config.keys()

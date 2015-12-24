@@ -52,7 +52,6 @@ class Toolbox(object):
         plugin = self.registry.get_plugin(name)
 
         if isinstance(plugin, ConfigMixin):
-
             config = self.config_manager.load_plugin(plugin.name)
             plugin.set_config(config)
 
@@ -64,7 +63,9 @@ class Toolbox(object):
             raise UnknownPlugin('Plugin not set')
         else:
             self._active_plugin = parsed_args.plugin
-            self._load_plugin(parsed_args.plugin)
+            # self._load_plugin(parsed_args.plugin)
+            for p in self.registry.get_plugins():
+                self._load_plugin(p.name)
 
         try:
             parsed_args.executable(parsed_args)

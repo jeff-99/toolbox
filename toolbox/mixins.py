@@ -17,3 +17,6 @@ class ConfigMixin(object):
 
     def get_config(self):
         return self._config
+
+    def get_global_config(self):
+        return self.get_config().get_global_config()
