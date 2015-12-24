@@ -32,7 +32,7 @@ class ConfigManager(object):
 
         if not os.path.exists(self._settings_file):
             with open(self._settings_file, 'w') as f:
-                from .defaults import TOOLBOX_DIR, CONF_DIR, LOCAL_PLUGIN_DIR, TOOLBOX_PREFIX, EXT_PLUGINS
+                from .defaults import TOOLBOX_DIR, CONF_DIR, LOCAL_PLUGIN_DIR, TOOLBOX_PREFIX
                 json.dump({
                     'toolbox_dir' : TOOLBOX_DIR,
                     'config_dir' : CONF_DIR,

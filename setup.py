@@ -1,5 +1,6 @@
 __author__ = 'jeff'
-from setuptools import setup
+from setuptools import setup, find_packages
+
 
 setup(
     name='toolbox',
@@ -11,6 +12,6 @@ setup(
     author_email='j_slort@hotmail.com',
     description='Pluggable toolbox',
     long_description="",
-    packages=['toolbox','toolbox.contrib'],
+    packages=find_packages(),
     entry_points = {'console_scripts': ['tbox = toolbox.cli:main']},
 )
