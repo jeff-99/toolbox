@@ -2,37 +2,30 @@ import os
 import json
 import collections
 from .mixins import ConfigMixin
+from .defaults import *
 import copy
 
 
 class ConfigManager(object):
 
-    TOOLBOX_DIR = '.toolbox'
-    CONFIG_DIR = 'config'
     FILE_EXT = '.json'
 
     def __init__(self):
-        toolbox_dir = os.path.join(os.path.expanduser('~'), ConfigManager.TOOLBOX_DIR)
-        config_dir = os.path.join(toolbox_dir, ConfigManager.CONFIG_DIR)
+        if not os.path.isdir(TOOLBOX_DIR):
+            os.mkdir(TOOLBOX_DIR)
 
-        if not os.path.isdir(toolbox_dir):
-            os.mkdir(toolbox_dir)
+        if not os.path.isdir(CONF_DIR):
+            os.mkdir(CONF_DIR)
 
-        if not os.path.isdir(config_dir):
-            os.mkdir(config_dir)
-
-        self.config_dir = config_dir
+        self.config_dir =  CONF_DIR
 
         # config plugin's config is global config
         self._settings_file = os.path.join(
-                            os.path.expanduser('~'),
-                            ConfigManager.TOOLBOX_DIR,
-                            ConfigManager.CONFIG_DIR,
+                            CONF_DIR,
                             'config' + ConfigManager.FILE_EXT)
 
         if not os.path.exists(self._settings_file):
             with open(self._settings_file, 'w') as f:
-                from .defaults import TOOLBOX_DIR, CONF_DIR, LOCAL_PLUGIN_DIR, TOOLBOX_PREFIX
                 json.dump({
                     'toolbox_dir' : TOOLBOX_DIR,
                     'config_dir' : CONF_DIR,
