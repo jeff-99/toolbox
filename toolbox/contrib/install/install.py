@@ -29,7 +29,7 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
             local_dir = self.get_config()['local_plugin_dir']
             module_dir = os.path.abspath(args.package)
             dir_hash = hashlib.md5(module_dir.encode('utf-8')).hexdigest()
-            symlink = os.path.join(self.get_config()['local_plugin_dir'], dir_hash)
+            symlink = os.path.join(self.get_global_config()['local_plugin_dir'], dir_hash)
             if command == 'install' and args.dev:
                 self.link('enable', symlink, module_dir)
             elif command == 'install':
