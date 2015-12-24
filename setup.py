@@ -1,10 +1,11 @@
 __author__ = 'jeff'
 from setuptools import setup, find_packages
 
+__VERSION__ = (0, 0, 2)
 
 setup(
     name='toolbox',
-    version='0.0.1',
+    version=".".join([str(part) for part in __VERSION__]),
     url='http://github.com/jeff-99/toolbox',
     license='MIT',
     author='Jeff Slort',
