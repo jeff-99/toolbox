@@ -23,7 +23,7 @@ class CreatePlugin(ConfigMixin, ToolboxPlugin):
         context['toolname'] = args.name
         template_path = os.path.join(os.path.dirname(__file__), 'templates', args.template)
 
-        dest_dir = args.dir if not args.dir is None else os.getcwd()
+        dest_dir = os.path.abspath(args.dir) if not args.dir is None else os.getcwd()
 
         if args.template == 'shell':
             command = input('Command to be executed by this plugin: ')
