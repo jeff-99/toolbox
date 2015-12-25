@@ -5,11 +5,13 @@ import os
 import sys
 
 
-MODULE_PREFIX = 'tbx_'
-LOCAL_PLUGIN_PATH = os.path.join(os.path.expanduser('~'), '.toolbox/plugins')
-
 
 def find_contrib_modules():
+    """
+    Find all core modules in the contrib package and return a list of importable packages
+    :return: A list of importable packages
+    :rtype: list
+    """
     contrib_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'contrib')
     modules = []
     for module_name in os.listdir(contrib_dir):
@@ -19,6 +21,13 @@ def find_contrib_modules():
 
 
 def find_local_modules(plugin_dir):
+    """
+    Find locally installed tools
+
+    :param str plugin_dir:
+    :return: A list of importable packages
+    :rtype: list
+    """
     if plugin_dir is None or not os.path.isdir(plugin_dir):
         return []
 
@@ -33,8 +42,10 @@ def find_local_modules(plugin_dir):
 
 def find_modules(prefix=None):
     """
-    Returns a list of importable modules
-    :return:
+    Find all python modules with that contain the given prefix as package name
+
+    :return: A list of importable packages
+    :rtype: list
     """
     if prefix is None:
         prefix = ''
@@ -47,11 +58,3 @@ def find_modules(prefix=None):
             modules.append(module.key)
 
     return modules
-
-
-
-if __name__ == '__main__':
-    # print(sys.modules)
-    find_contrib_modules()
-    # find_modules()
-    # pass

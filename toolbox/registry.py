@@ -10,8 +10,13 @@ class NoPluginException (Exception):
 class Registry(object):
     """
     Registry of all available plugins
-    """
+    Setup the config manager and creates two empty dicts to track the tools
 
+    :ivar `toolbox.config.ConfigManager` config_manager: Instance of the config manager
+    :ivar dict _registered_plugins: dictionary containing all registered plugins
+    :ivar dict _loaded_plugins: dictionary containing all fully loaded plugins
+
+    """
     def __init__(self):
         self.config_manager = ConfigManager()
         self._registered_plugins = {}
@@ -19,10 +24,12 @@ class Registry(object):
 
     def add_plugin(self, plugin):
         """
-        Add a ToolboxPlugin to the registry.
-         Instances of toolbox plugins need a name attribute for this to work
+        Add a :py:class:`toolbox.plugin.ToolboxPlugin` to the registry, but don't load it yet
+         Checks whether the provided plugin is an instance of :py:class:`toolbox.plugin.ToolboxPlugin`
 
-        :param plugin:
+        :param plugin: A plugin to add to the registry
+        :type plugin: :py:class:`toolbox.plugin.ToolboxPlugin`
+        :raises: :py:class:`AtttibuteError`, :py:class:`toolbox.registry.NoPluginException`
         :return:
         """
         if not isinstance(plugin, ToolboxPlugin):
@@ -48,7 +55,10 @@ class Registry(object):
     def populate(self, modules):
         """
         Given a list of 'importable' modules populate the registry
-        :param modules:
+        First import the module, check whether it has a 'Plugin' attribute in the namespace and
+        add the plugin to the registry
+
+        :param list modules:
         :return:
         """
         for module in modules:
@@ -60,6 +70,10 @@ class Registry(object):
             self.add_plugin(m.Plugin)
 
     def get_plugin_names(self):
+        """
+        :return: the list of registered plugins (names)
+        :rtype: list
+        """
         return self._registered_plugins.keys()
 
     def get_plugins(self):
@@ -70,6 +84,14 @@ class Registry(object):
         return self._registered_plugins.values()
 
     def get_plugin(self,name):
+        """
+        fetch a plugin from the registry and load it if it is not loaded already.
+
+        :param str name: Name of the registered plugin
+        :return: An loaded plugin
+        :rtype: :py:class:`toolbox.plugin.ToolboxPlugin`
+        :raise: :py:class:`ValueError`
+        """
         if name in self._loaded_plugins:
             return self._loaded_plugins[name]
 
@@ -81,4 +103,8 @@ class Registry(object):
         raise ValueError('the {} Plugin is not registered'.format(name))
 
     def shutdown(self):
+        """
+        Shutdown the registry and notify the config manager to shutdown
+        :return:
+        """
         self.config_manager.save(self._loaded_plugins.values())

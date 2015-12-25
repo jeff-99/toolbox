@@ -10,9 +10,18 @@ class UnknownPlugin(Exception):
 
 
 class Toolbox(object):
+    """
+        Initialize the toolbox, sets up the main argument parser and Tool registry
+        Core tools in de contrib package are always loaded
+
+        The local and external flags can be used to limit the loaded modules
+
+        :param bool external:
+        :param bool local:
+        :return:
+        """
     
     def __init__(self, external=True, local=True):
-
         # load core plugins
         modules = find_contrib_modules()
 
@@ -31,6 +40,11 @@ class Toolbox(object):
         self.registry.populate(extra_modules)
 
     def prepare(self):
+        """
+        Prepares the main Argument parser by loading all registered plugins and setting their executable
+
+        :return:
+        """
         # prepare main parser
         self.parser.usage = '%(prog)s tool [args]'
         self.parser.description = 'Extendable plugin toolbox'
@@ -50,6 +64,18 @@ class Toolbox(object):
 
 
     def execute(self, args):
+        """
+        This is the Toolbox's main function which parses the arguments, which should yield:
+         - a Tool
+         - an Executable
+         - and some optional arguments
+
+        The Tool gets fetched from the registry where it will be fully loaded
+         and the exectuble is executed with the remaining args
+        :param args: List of arguments
+        :type args: list
+        :return:
+        """
         parsed_args = self.parser.parse_args(args)
 
         if parsed_args.plugin is None:
@@ -65,5 +91,26 @@ class Toolbox(object):
             print(e)
 
     def shutdown(self):
+        """
+        Shuts down the application, save and close config files etc.
+        :return:
+        """
         self.registry.shutdown()
+
+    def __call__(self, args):
+        """
+        Run the Toolbox with the supplied arguments.
+        This method is primarily used by the commandline script
+
+        :param args:
+        :return:
+        """
+        self.prepare()
+
+        try:
+            self.execute(args)
+        except UnknownPlugin:
+            return
+
+        self.shutdown()
 
