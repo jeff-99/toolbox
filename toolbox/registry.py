@@ -2,7 +2,7 @@ __author__ = 'jeff'
 from .plugin import ToolboxPlugin
 from .mixins import RegistryMixin, ConfigMixin
 from .config import ConfigManager
-import importlib
+import importlib, inspect
 
 class NoPluginException (Exception):
     pass
@@ -58,16 +58,24 @@ class Registry(object):
         First import the module, check whether it has a 'Plugin' attribute in the namespace and
         add the plugin to the registry
 
+        Also accepts an module where there is a class definition suffixed by 'Plugin' like 'TestPlugin'
+
         :param list modules:
         :return:
         """
         for module in modules:
             m = importlib.import_module(module)
 
-            if not hasattr(m,'Plugin'):
-                raise NoPluginException('Module: {} has no plugin set'.format(module))
+            if hasattr(m,'Plugin'):
+                self.add_plugin(m.Plugin)
+                continue
 
-            self.add_plugin(m.Plugin)
+            for name, plugin_class in inspect.getmembers(m):
+                if 'Plugin' in name:
+                    p = plugin_class()
+                    self.add_plugin(p)
+
+
 
     def get_plugin_names(self):
         """

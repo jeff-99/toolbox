@@ -25,13 +25,14 @@ class NotCallableException (Exception):
 
 class BasePlugin(ToolboxPlugin):
     """
-        An easy to use Plugin wrapper that sets all the necessary parts of a ToolboxPlugin
-        :param name: The name of the plugin
-        :param description: short description of the plugin (used to index and search plugins)
-        :param prepare_parser_func: The function that prepares the Toolbox main parser
-        :param execute_func: the main function of the plugin, accecpts :py:class:`argparse.Namespace`
-        :return:
-        """
+    An easy to use Plugin wrapper that sets all the necessary parts of a ToolboxPlugin
+
+    :param name: The name of the plugin
+    :param description: short description of the plugin (used to index and search plugins)
+    :param prepare_parser_func: The function that prepares the Toolbox main parser
+    :param execute_func: the main function of the plugin, accecpts :py:class:`argparse.Namespace`
+    :return:
+    """
     def __init__(self,name, description=None, prepare_parser_func=None, execute_func=None):
         if not prepare_parser_func is None:
             self.set_prepare_parser(prepare_parser_func)
