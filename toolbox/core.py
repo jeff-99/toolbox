@@ -11,24 +11,24 @@ class UnknownPlugin(Exception):
 
 class Toolbox(object):
     
-    def __init__(self, external=True,contrib=True,local=True):
+    def __init__(self, external=True, local=True):
 
-        self.config_manager = ConfigManager()
-        global_config = self.config_manager.get_global_config()
-
-        modules = []
-        if contrib:
-            modules += find_contrib_modules()
-        if external:
-            modules += find_modules(global_config['toolbox_prefix'])
-        if local:
-            modules += find_local_modules(global_config['local_plugin_dir'])
+        # load core plugins
+        modules = find_contrib_modules()
 
         self.registry = Registry()
+        self.registry.populate(modules)
         self.parser = argparse.ArgumentParser()
 
-        self.registry.populate(modules)
-        self._active_plugin = None
+        global_config = self.registry.get_plugin('config').get_config()
+
+        extra_modules = []
+        if external:
+            extra_modules += find_modules(global_config['toolbox_prefix'])
+        if local:
+            extra_modules += find_local_modules(global_config['local_plugin_dir'])
+
+        self.registry.populate(extra_modules)
 
     def prepare(self):
         # prepare main parser
@@ -48,12 +48,6 @@ class Toolbox(object):
             # let the plugin prepare the arguments
             plugin.prepare_parser(plugin_parser)
 
-    def _load_plugin(self, name):
-        plugin = self.registry.get_plugin(name)
-
-        if isinstance(plugin, ConfigMixin):
-            config = self.config_manager.load_plugin(plugin.name)
-            plugin.set_config(config)
 
     def execute(self, args):
         parsed_args = self.parser.parse_args(args)
@@ -62,11 +56,8 @@ class Toolbox(object):
             self.parser.print_help()
             raise UnknownPlugin('Plugin not set')
         else:
-            self._active_plugin = parsed_args.plugin
-            # self._load_plugin(parsed_args.plugin)
-            for p in self.registry.get_plugins():
-                self._load_plugin(p.name)
-
+            # triggers the lazy loading of the selected plugin
+            self.registry.get_plugin(parsed_args.plugin)
         try:
             parsed_args.executable(parsed_args)
         except Exception as e:
@@ -74,7 +65,5 @@ class Toolbox(object):
             print(e)
 
     def shutdown(self):
-        active_plugin = self.registry.get_plugin(self._active_plugin)
-        if isinstance(active_plugin, ConfigMixin):
-            self.config_manager.save_plugin(active_plugin.name, active_plugin.get_config())
+        self.registry.shutdown()
 

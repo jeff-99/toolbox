@@ -17,8 +17,10 @@ class ConfigManager(object):
         if not os.path.isdir(CONF_DIR):
             os.mkdir(CONF_DIR)
 
-        self.config_dir =  CONF_DIR
+        self.config_dir = CONF_DIR
+        self._init_global_config()
 
+    def _init_global_config(self):
         # config plugin's config is global config
         self._settings_file = os.path.join(
                             CONF_DIR,
@@ -72,7 +74,9 @@ class ConfigManager(object):
     def save(self, plugins):
         for plugin in plugins:
             if isinstance(plugin, ConfigMixin):
-                self.save_plugin(plugin.name, plugin.get_config())
+                conf = plugin.get_config()
+                if conf.modified:
+                    self.save_plugin(plugin.name, conf)
 
     def get_global_config(self):
         return self._global_config
@@ -116,14 +120,17 @@ class PluginConfig(object):
 
     def __init__(self):
         self._config = collections.defaultdict(lambda: None)
+        self.modified = False
 
     def __getitem__(self, item):
         return self._config[item]
 
     def __setitem__(self, key, value):
+        self.modified = True if key != PluginConfig.GLOBAL_KEY else False
         self._config[key] = value
 
     def __delitem__(self, key):
+        self.modified = True if key != PluginConfig.GLOBAL_KEY else False
         del self._config[key]
 
     def __contains__(self, item):
@@ -134,6 +141,7 @@ class PluginConfig(object):
             return self
 
         for key in other.keys():
+            self.modified = True if key != PluginConfig.GLOBAL_KEY else False
             self[key] = other[key]
 
         return self
@@ -149,6 +157,7 @@ class PluginConfig(object):
 
         for key in other.keys():
             if key in self:
+                self.modified = True if key != PluginConfig.GLOBAL_KEY else False
                 del self[key]
 
         return self

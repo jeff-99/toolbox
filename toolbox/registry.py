@@ -1,6 +1,7 @@
 __author__ = 'jeff'
 from .plugin import ToolboxPlugin
-from .mixins import RegistryMixin
+from .mixins import RegistryMixin, ConfigMixin
+from .config import ConfigManager
 import importlib
 
 class NoPluginException (Exception):
@@ -10,7 +11,11 @@ class Registry(object):
     """
     Registry of all available plugins
     """
-    _registered_plugins = {}
+
+    def __init__(self):
+        self.config_manager = ConfigManager()
+        self._registered_plugins = {}
+        self._loaded_plugins = {}
 
     def add_plugin(self, plugin):
         """
@@ -20,17 +25,24 @@ class Registry(object):
         :param plugin:
         :return:
         """
-        if not isinstance(plugin , ToolboxPlugin):
+        if not isinstance(plugin, ToolboxPlugin):
             raise NoPluginException('provided plugin argument is not does not extend the core ToolboxPlugin class')
         if not hasattr(plugin, 'name') or plugin.name is None:
             raise AttributeError('Plugin has no name attribute set')
         if not hasattr(plugin, 'description') or plugin.description is None:
             raise AttributeError("Plugin {} has no description".format(plugin.description))
 
+        self._registered_plugins[plugin.name] = plugin
+
+    def _load_plugin(self, plugin):
         if isinstance(plugin, RegistryMixin):
             plugin.set_registry(self)
 
-        self._registered_plugins[plugin.name] = plugin
+        if isinstance(plugin, ConfigMixin):
+            config = self.config_manager.load_plugin(plugin.name)
+            plugin.set_config(config)
+
+        return plugin
 
 
     def populate(self, modules):
@@ -50,7 +62,6 @@ class Registry(object):
     def get_plugin_names(self):
         return self._registered_plugins.keys()
 
-
     def get_plugins(self):
         """
         :return: List of registered plugins
@@ -59,7 +70,15 @@ class Registry(object):
         return self._registered_plugins.values()
 
     def get_plugin(self,name):
+        if name in self._loaded_plugins:
+            return self._loaded_plugins[name]
+
         if name in self._registered_plugins:
-            return self._registered_plugins[name]
+            plugin = self._load_plugin(self._registered_plugins[name])
+            self._loaded_plugins[name] = plugin
+            return plugin
 
         raise ValueError('the {} Plugin is not registered'.format(name))
+
+    def shutdown(self):
+        self.config_manager.save(self._loaded_plugins.values())

@@ -6,6 +6,7 @@ class ToolboxPlugin(object):
     __metaclass__ = ABCMeta
 
     name = None
+    description = None
 
     @abstractmethod
     def prepare_parser(self, parser):
