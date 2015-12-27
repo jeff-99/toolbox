@@ -34,7 +34,7 @@ class Toolbox(object):
         extra_modules = []
         if external:
             extra_modules += find_modules(global_config.get('toolbox_prefix'))
-            extra_modules += global_config.get('external_plugins')
+            extra_modules += global_config.get('external_plugins') or []
         if local:
             extra_modules += find_local_modules(global_config.get('local_plugin_dir'))
 
