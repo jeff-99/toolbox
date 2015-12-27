@@ -18,7 +18,7 @@ test_requirements = [
 
 setup(
     name='tool-box',
-    version='0.3.2',
+    version='0.3.3',
     description="tools for your toolbox , neatly organised",
     long_description=readme + '\n\n' + history,
     author='Jeff Slort',
