@@ -33,11 +33,11 @@ class Registry(object):
         :return:
         """
         if not isinstance(plugin, ToolboxPlugin):
-            raise NoPluginException('provided plugin argument is not does not extend the core ToolboxPlugin class')
+            raise NoPluginException('provided plugin argument does not extend the core ToolboxPlugin class')
         if not hasattr(plugin, 'name') or plugin.name is None:
-            raise AttributeError('Plugin has no name attribute set')
+            raise AttributeError('Plugin {} has no name attribute set'.format(plugin))
         if not hasattr(plugin, 'description') or plugin.description is None:
-            raise AttributeError("Plugin {} has no description".format(plugin.description))
+            raise AttributeError("Plugin {} has no description".format(plugin))
 
         self._registered_plugins[plugin.name] = plugin
 

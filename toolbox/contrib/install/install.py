@@ -26,31 +26,20 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
 
         # check if given package is a local directory
         if os.path.exists(args.package):
-            local_dir = self.get_config()['local_plugin_dir']
-            module_dir = os.path.abspath(args.package)
-            dir_hash = hashlib.md5(module_dir.encode('utf-8')).hexdigest()
-            symlink = os.path.join(self.get_global_config()['local_plugin_dir'], dir_hash)
-            if command == 'install' and args.dev:
-                self.link('enable', symlink, module_dir)
-            elif command == 'install':
-                try:
-                    name = args.package.split('/')[-1]
-                    shutil.copytree(args.package,os.path.join(local_dir,name))
-                except Exception as e:
-                    print('Installation of {} failed with : {}'.format(args.package,e))
-            elif command == 'uninstall' and args.dev:
-                self.link('disable', symlink)
-            elif command == 'uninstall':
-                try:
-                    name = args.package.split('/')[-1]
-                    shutil.rmtree(os.path.join(local_dir,name))
-                except Exception as e:
-                    print('Installation of {} failed with : {}'.format(args.package,e))
 
+            src_dir = os.path.abspath(args.package)
+            package_name = args.package.split('/')[-1] if not args.dev else hashlib.md5(src_dir.encode('utf-8')).hexdigest()
 
-        elif command == 'uninstall' and args.package in find_local_modules(self.get_config()['local_plugin_dir']):
+            if command == 'install':
+                self.local_install(src_dir,package_name,args.dev)
+
+            if command == 'uninstall':
+                self.local_uninstall(package_name,args.dev)
+
+        elif command == 'uninstall' and args.package in find_local_modules(self.get_global_config()['local_plugin_dir']):
             # uninstall local plugins by name
-            shutil.rmtree(os.path.join(self.get_config()['local_plugin_dir'], args.package))
+            self.local_uninstall(args.package)
+
         else:
             # not a local dir let pip do the heavy lifting
             pip.main([command, args.package])
@@ -60,7 +49,7 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
             # find the package directory
             m = importlib.import_module(args.package)
             module_dir = os.path.dirname(inspect.getfile(m))
-            symlink = os.path.join(self.get_config()['local_plugin_dir'], args.package)
+            symlink = os.path.join(self.get_global_config()['local_plugin_dir'], args.package)
 
             if args.enable:
                 # symlink the directory in the local plugin dir
@@ -77,4 +66,43 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
             os.symlink(module_dir,symlink , True)
         elif type == 'disable':
             os.unlink(symlink)
+
+    def local_install(self,src_dir, package_name, dev=False):
+        """
+        Install a package from source with the given name
+        If dev == True a symlink is created instead for development
+        :param str src_dir:
+        :param str package_name:
+        :param bool dev:
+        :return:
+        """
+        local_dir = self.get_global_config()['local_plugin_dir']
+        dest_dir = os.path.join(local_dir, package_name)
+
+        if dev:
+            self.link('enable', dest_dir, src_dir)
+        else:
+            try:
+                shutil.copytree(src_dir,dest_dir)
+            except Exception as e:
+                print('Installation of {} failed with : {}'.format(src_dir,e))
+
+    def local_uninstall(self,package_name, dev=False):
+        """
+        Uninstall a locally installed plugin
+        If dev == True the symlink is deleted
+        :param package_name:
+        :param dev:
+        :return:
+        """
+        local_dir = self.get_global_config()['local_plugin_dir']
+        dest_dir = os.path.join(local_dir, package_name)
+
+        if dev:
+            self.link('disable', dest_dir)
+        else:
+            try:
+                shutil.rmtree(dest_dir)
+            except Exception as e:
+                print('Installation of {} failed with : {}'.format(dest_dir,e))
 

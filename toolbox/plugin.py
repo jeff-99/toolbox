@@ -43,12 +43,30 @@ class BasePlugin(ToolboxPlugin):
         self.description = description
 
     def set_prepare_parser(self, prepare_parser_func):
+        """
+        Set the callable that prepares the Toolbox parser.
+        the callable gets a argparse.Argumentparser as argument
+
+        :param parser:
+        :type parser: function
+        :raise: py:class:`toolbox.plugin.NotCallableException`
+        :return:
+        """
         if hasattr(prepare_parser_func, '__call__'):
             self.prepare_parser_func = prepare_parser_func
         else:
             raise NotCallableException("{} is not callable".format(prepare_parser_func))
 
     def set_execute(self, execute_func):
+        """
+        Set the executable for the toolbox.
+        the executable gets passed a ArgumentParser Namespace
+
+        :param parser:
+        :type parser: function
+        :raise: py:class:`toolbox.plugin.NotCallableException`
+        :return:
+        """
         if hasattr(execute_func, '__call__'):
             self.execute_func = execute_func
         else:
@@ -76,7 +94,16 @@ class BasePlugin(ToolboxPlugin):
 
 
 class ExecutablePlugin(ToolboxPlugin):
+    """
+    The ExecutablePlugin is a basic plugin to register shell scripts and the like.
+    Just subclass it and provide the following attributes:
+     - name
+     - description (optional)
+     - executable (the main executable)
+     - args (a list of default arguments)
 
+    optionally the prepare_parser and execute methods can be overridden to add exta functionality
+    """
     name = None
     description = None
     executable = None
@@ -93,3 +120,23 @@ class ExecutablePlugin(ToolboxPlugin):
 
         command = [executable] + self.args + args.args
         subprocess.call(command)
+
+    def setup(self, name, executable, **kwargs):
+        """
+        Method to setup an Executable plugin, no need to subclass it this way!
+
+        :param name:
+        :param executable:
+        :param kwargs:
+        :return:
+        """
+        self.name = name
+        self.executable = executable
+
+        if 'description' in kwargs:
+            self.description = kwargs['description']
+
+        if 'args' in kwargs:
+            self.args = kwargs['args']
+
+

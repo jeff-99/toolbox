@@ -1,5 +1,5 @@
 import argparse
-from .registry import Registry
+from .registry import Registry, NoPluginException
 from .scanner import find_contrib_modules, find_modules, find_local_modules
 from .config import ConfigManager
 from .mixins import ConfigMixin
@@ -37,7 +37,11 @@ class Toolbox(object):
         if local:
             extra_modules += find_local_modules(global_config['local_plugin_dir'])
 
-        self.registry.populate(extra_modules)
+        try:
+            self.registry.populate(extra_modules)
+        except (AttributeError, NoPluginException) as e:
+            print("An external Plugin caused trouble, please uninstall it -- {}".format(e))
+
 
     def prepare(self):
         """

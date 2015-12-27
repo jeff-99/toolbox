@@ -2,21 +2,22 @@ __author__ = 'jeff'
 
 
 from toolbox.plugin import ToolboxPlugin
-from toolbox.mixins import ConfigMixin
+from toolbox.mixins import ConfigMixin, RegistryMixin
+from toolbox.utils import generate_name
 from .parser import Parser
 import os
 
-class CreatePlugin(ConfigMixin, ToolboxPlugin):
+class CreatePlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
     name = 'create'
     description = 'Create a new plugin'
 
     def prepare_parser(self, parser):
         group = parser.add_mutually_exclusive_group()
-        group.add_argument('-i', '--install', action='store_true')
+        group.add_argument('-i', '--install', action='store_true', help="Create and directly install new plugin")
         group.add_argument('-d','--dir', type=str, help='Source directory of your new plugin')
 
         parser.add_argument('-t', '--template', choices=['default', 'shell'], default='default')
-        parser.add_argument('name', type=str, help='Name of your new plugin')
+        parser.add_argument('name', type=str, help='Name of your new plugin', default=generate_name(), nargs="?")
 
     def execute(self, args):
         context = {}
@@ -32,7 +33,7 @@ class CreatePlugin(ConfigMixin, ToolboxPlugin):
             context["args"] = argv
 
             if args.install:
-                dest_dir = self.get_config()['local_plugin_dir']
+                dest_dir = self.get_global_config()['local_plugin_dir']
 
         p = Parser(template_path, dest_dir, context)
 

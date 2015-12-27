@@ -17,6 +17,9 @@ class ConfigManager(object):
         if not os.path.isdir(CONF_DIR):
             os.mkdir(CONF_DIR)
 
+        if not os.path.isdir(LOCAL_PLUGIN_DIR):
+            os.mkdir(LOCAL_PLUGIN_DIR)
+
         self.config_dir = CONF_DIR
         self._init_global_config()
 
