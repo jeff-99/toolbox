@@ -29,13 +29,14 @@ class Toolbox(object):
         self.registry.populate(modules)
         self.parser = argparse.ArgumentParser()
 
-        global_config = self.registry.get_plugin('config').get_config()
+        global_config = self.registry.get_plugin('config')
 
         extra_modules = []
         if external:
-            extra_modules += find_modules(global_config['toolbox_prefix'])
+            extra_modules += find_modules(global_config.get('toolbox_prefix'))
+            extra_modules += global_config.get('external_plugins')
         if local:
-            extra_modules += find_local_modules(global_config['local_plugin_dir'])
+            extra_modules += find_local_modules(global_config.get('local_plugin_dir'))
 
         try:
             self.registry.populate(extra_modules)

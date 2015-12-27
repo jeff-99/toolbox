@@ -1,20 +1,20 @@
 __author__ = 'jeff'
 
 from toolbox.plugin import ToolboxPlugin
-from toolbox.mixins import ConfigMixin
+from toolbox.mixins import ConfigMixin, RegistryMixin
 from toolbox.scanner import find_local_modules
 import pip, os, shutil, inspect, importlib, hashlib
 
-class InstallPlugin (ConfigMixin, ToolboxPlugin):
+class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
 
     name = 'install'
     description = 'Install a toolbox plugin from pypi or git'
 
     def prepare_parser(self, parser):
-        parser.add_argument("-u","--uninstall", action="store_true", help="Uninstall plugin")
-        parser.add_argument("--dev", action='store_true', help="Install a dev plugin")
-        parser.add_argument("-e", "--enable", action="store_true", help="enable existing package as toolbox plugin")
-        parser.add_argument("-d", "--disable", action="store_true", help="disable an symlinked package")
+        parser.add_argument("-u", "--uninstall", action="store_true", help="Uninstall plugin")
+        parser.add_argument("-d", "--dev", action='store_true', help="Install a dev plugin")
+        parser.add_argument("-e", "--external", action="store_true", help="enable an existing python package as toolbox plugin")
+        parser.add_argument("--disable-only", action="store_true", help="Option to only disable the external module for the toolbox, not uninstall it")
         parser.add_argument("package")
 
 
@@ -40,32 +40,24 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
             # uninstall local plugins by name
             self.local_uninstall(args.package)
 
-        else:
+        elif not args.disable_only:
             # not a local dir let pip do the heavy lifting
             pip.main([command, args.package])
 
-        # check if enable flag is set and if any of the installed packages contains the name of the module provided
-        if (args.enable or args.disable) and any([args.package in package.key for package in pip.get_installed_distributions()]):
-            # find the package directory
-            m = importlib.import_module(args.package)
-            module_dir = os.path.dirname(inspect.getfile(m))
-            symlink = os.path.join(self.get_global_config()['local_plugin_dir'], args.package)
+        # check if external flag is set and if any of the installed packages contains the name of the module provided
+        if args.external and any([args.package in package.key for package in pip.get_installed_distributions()]):
+            config_tool = self.get_registry().get_plugin('config')
+            external_plugins = set(config_tool.get('external_plugins') or [])
 
-            if args.enable:
-                # symlink the directory in the local plugin dir
-                self.link('enable', symlink, module_dir)
-                print("{} is enabled to use with Toolbox".format(args.package))
+            if command == "install":
+                external_plugins.add(args.package)
+                message = "{} is enabled to use with Toolbox"
+            else:
+                external_plugins.remove(args.package)
+                message = "{} is uninstalled to use with Toolbox"
 
-            if args.disable:
-                self.link('disable', symlink)
-                print("{} is disabled".format(args.package))
-
-
-    def link(self, type,symlink, module_dir = None):
-        if type == 'enable':
-            os.symlink(module_dir,symlink , True)
-        elif type == 'disable':
-            os.unlink(symlink)
+            config_tool.set('external_plugins', list(external_plugins))
+            print(message.format(args.package))
 
     def local_install(self,src_dir, package_name, dev=False):
         """
@@ -80,7 +72,7 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
         dest_dir = os.path.join(local_dir, package_name)
 
         if dev:
-            self.link('enable', dest_dir, src_dir)
+            os.symlink(dest_dir,src_dir , True)
         else:
             try:
                 shutil.copytree(src_dir,dest_dir)
@@ -99,7 +91,7 @@ class InstallPlugin (ConfigMixin, ToolboxPlugin):
         dest_dir = os.path.join(local_dir, package_name)
 
         if dev:
-            self.link('disable', dest_dir)
+            os.unlink(dest_dir)
         else:
             try:
                 shutil.rmtree(dest_dir)
