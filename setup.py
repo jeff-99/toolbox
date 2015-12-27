@@ -17,9 +17,9 @@ test_requirements = [
 ]
 
 setup(
-    name='toolbox',
+    name='tool-box',
     version='0.3.0',
-    description="Extensible toolbox for all your tools",
+    description="tools for your toolbox , neatly organised",
     long_description=readme + '\n\n' + history,
     author='Jeff Slort',
     author_email='j_slort@hotmail.com',
@@ -33,5 +33,10 @@ setup(
     tests_require=test_requirements,
 
     packages=find_packages(),
-    entry_points = {'console_scripts': ['tbox = toolbox.cli:main']},
+    entry_points = {
+        'console_scripts': [
+            'tbox = toolbox.cli:main',
+            'toolbox = toolbox.cli:main'
+        ]
+    },
 )
