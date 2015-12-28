@@ -46,6 +46,7 @@ class Parser(object):
         return "".join(new_data)
 
     def parse(self):
+
         dir_content = []
         for cur_path, dirs, files in os.walk(self.template_dir):
 
@@ -56,5 +57,6 @@ class Parser(object):
             file_contents = [self._parse_file(os.path.join(cur_path,fp)) for fp in files]
 
             dir_content.append((path, file_paths, file_contents))
+
 
         return dir_content

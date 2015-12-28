@@ -5,7 +5,7 @@ from toolbox.plugin import ToolboxPlugin
 from toolbox.mixins import ConfigMixin, RegistryMixin
 from toolbox.utils import generate_name
 from .parser import Parser
-import os
+import os, tempfile, zipfile, shutil
 
 class CreatePlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
     name = 'create'
@@ -22,7 +22,12 @@ class CreatePlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
     def execute(self, args):
         context = {}
         context['toolname'] = args.name
-        template_path = os.path.join(os.path.dirname(__file__), 'templates', args.template)
+        template_src = os.path.join(os.path.dirname(__file__), 'templates', args.template + ".zip")
+
+        temp_dir =tempfile.mkdtemp()
+        zipfile.ZipFile(template_src).extractall(temp_dir)
+
+        template_path = os.path.join(os.path.join(temp_dir,args.template))
 
         dest_dir = os.path.abspath(args.dir) if not args.dir is None else os.getcwd()
 
@@ -45,4 +50,6 @@ class CreatePlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
                 with open(os.path.join(dir, fp), 'w') as f:
                     f.write(file_contents[i])
 
+        # remove tmp dir
+        shutil.rmtree(temp_dir)
 
