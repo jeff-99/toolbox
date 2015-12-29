@@ -49,7 +49,7 @@ class Parser(object):
         dir_content = []
         for cur_path, dirs, files in os.walk(self.template_dir):
 
-            new_path = re.sub(self.template_dir, self.dest_dir, cur_path)
+            new_path =  cur_path.replace(self.template_dir, self.dest_dir)
 
             path = self._parse_path(new_path)
             file_paths = [self._parse_path(fp) for fp in files]
