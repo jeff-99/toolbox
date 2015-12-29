@@ -72,7 +72,7 @@ class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
         dest_dir = os.path.join(local_dir, package_name)
 
         if dev:
-            os.symlink(dest_dir,src_dir , True)
+            os.symlink(src_dir, dest_dir)
         else:
             try:
                 shutil.copytree(src_dir,dest_dir)
