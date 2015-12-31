@@ -21,3 +21,13 @@ class ConfigMixin(object):
 
     def get_global_config(self):
         return self.get_config().get_global_config()
+
+
+class LogMixin(object):
+    _logger = None
+
+    def set_logger(self, logger):
+        self._logger = logger
+
+    def get_logger(self):
+        return self._logger

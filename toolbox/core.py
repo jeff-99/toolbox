@@ -1,10 +1,9 @@
-import argparse
-import logging
+import argparse, logging, os
+from logging import FileHandler
+from logging import Formatter
+from .defaults import TOOLBOX_DIR
 from .registry import Registry, NoPluginException
 from .scanner import find_contrib_modules, find_modules, find_local_modules
-
-logger = logging.getLogger(__name__)
-
 
 class UnknownPlugin(Exception):
     pass
@@ -23,7 +22,6 @@ class Toolbox(object):
         """
     
     def __init__(self, external=True, local=True):
-        logger.critical('zuigenndddd')
         # load core plugins
         modules = find_contrib_modules()
 
@@ -34,6 +32,8 @@ class Toolbox(object):
         global_config = self.registry.get_plugin('config')
         if len(global_config.get_config()) == 0:
             global_config.set_defaults()
+
+        self._init_logger(debug=global_config.get('debug'))
 
         extra_modules = []
         if external:
@@ -47,6 +47,21 @@ class Toolbox(object):
         except (AttributeError, NoPluginException) as e:
             print("An external Plugin caused trouble, please uninstall it -- {}".format(e))
 
+    def _init_logger(self,debug):
+        """
+        Initialise the main logger
+        :param debug:
+        :return:
+        """
+        logger = logging.getLogger('toolbox')
+        handler = FileHandler(os.path.join(TOOLBOX_DIR, 'toolbox.log'), 'w','utf-8')
+        formatter = Formatter(fmt="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.setLevel(logging.WARNING)
+
+        if debug is True:
+            logger.setLevel(logging.DEBUG)
 
     def prepare(self):
         """

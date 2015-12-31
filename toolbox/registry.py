@@ -1,8 +1,8 @@
 __author__ = 'jeff'
 from .plugin import ToolboxPlugin
-from .mixins import RegistryMixin, ConfigMixin
+from .mixins import RegistryMixin, ConfigMixin, LogMixin
 from .config import ConfigManager
-import importlib, inspect
+import importlib, inspect, logging
 
 class NoPluginException (Exception):
     pass
@@ -50,6 +50,10 @@ class Registry(object):
             if 'config' in self._loaded_plugins:
                 config.set_global_config(self.get_plugin('config').get_config())
             plugin.set_config(config)
+
+        if isinstance(plugin, LogMixin):
+            logger = logging.getLogger('toolbox.plugins.{}'.format(plugin.name))
+            plugin.set_logger(logger)
 
         return plugin
 
