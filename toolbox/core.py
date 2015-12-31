@@ -30,6 +30,8 @@ class Toolbox(object):
         self.parser = argparse.ArgumentParser()
 
         global_config = self.registry.get_plugin('config')
+        if len(global_config.get_config()) == 0:
+            global_config.set_defaults()
 
         extra_modules = []
         if external:

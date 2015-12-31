@@ -2,10 +2,11 @@ __author__ = 'jeff'
 
 from toolbox.plugin import ToolboxPlugin
 from toolbox.mixins import ConfigMixin
+from toolbox.defaults import *
 
 class ConfigPlugin (ConfigMixin, ToolboxPlugin):
     name = 'config'
-    description = 'Config API'
+    description = 'Config API holds and controls the global config'
 
     def prepare_parser(self, parser):
         parser.add_argument('method', choices=['set','get'])
@@ -23,3 +24,15 @@ class ConfigPlugin (ConfigMixin, ToolboxPlugin):
 
     def get(self, key):
         return self.get_config()[key]
+
+    def set_defaults(self):
+        """
+        Sets the default config variables, used when toolbox is used for the first time
+        :return:
+        """
+        self.set('toolbox_dir',TOOLBOX_DIR)
+        self.set('config_dir', CONF_DIR)
+        self.set('local_plugin_dir', LOCAL_PLUGIN_DIR)
+        self.set('toolbox_prefix', TOOLBOX_PREFIX)
+        self.set('external_plugins', [])
+
