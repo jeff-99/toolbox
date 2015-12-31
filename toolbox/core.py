@@ -1,8 +1,9 @@
 import argparse
+import logging
 from .registry import Registry, NoPluginException
 from .scanner import find_contrib_modules, find_modules, find_local_modules
-from .config import ConfigManager
-from .mixins import ConfigMixin
+
+logger = logging.getLogger(__name__)
 
 
 class UnknownPlugin(Exception):
@@ -22,6 +23,7 @@ class Toolbox(object):
         """
     
     def __init__(self, external=True, local=True):
+        logger.critical('zuigenndddd')
         # load core plugins
         modules = find_contrib_modules()
 
