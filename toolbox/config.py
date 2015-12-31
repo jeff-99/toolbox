@@ -21,25 +21,6 @@ class ConfigManager(object):
             os.mkdir(LOCAL_PLUGIN_DIR)
 
         self.config_dir = CONF_DIR
-        self._init_global_config()
-
-    def _init_global_config(self):
-        # config plugin's config is global config
-        self._settings_file = os.path.join(
-                            CONF_DIR,
-                            'config' + ConfigManager.FILE_EXT)
-
-        if not os.path.exists(self._settings_file):
-            with open(self._settings_file, 'w') as f:
-                json.dump({
-                    'toolbox_dir' : TOOLBOX_DIR,
-                    'config_dir' : CONF_DIR,
-                    'local_plugin_dir' : LOCAL_PLUGIN_DIR,
-                    'toolbox_prefix' : TOOLBOX_PREFIX
-                },f)
-
-        with open(self._settings_file, 'r') as f:
-            self._global_config = PluginConfig.create_from_dict(json.load(f))
 
     def load_plugin(self, name):
         file_name = name + ConfigManager.FILE_EXT
@@ -58,8 +39,6 @@ class ConfigManager(object):
                 except ValueError:
                     plugin_config = PluginConfig()
 
-        global_conf = self.get_global_config()
-        plugin_config.set_global_config(global_conf)
         return plugin_config
 
 
@@ -70,7 +49,8 @@ class ConfigManager(object):
         if os.path.exists(path) and not os.path.isfile(path):
             raise Exception('path exists but it ain\'t a file Brah')
 
-        del config[PluginConfig.GLOBAL_KEY]
+        if PluginConfig.GLOBAL_KEY in config:
+            del config[PluginConfig.GLOBAL_KEY]
 
         self._save_config(path, config)
 
@@ -80,12 +60,6 @@ class ConfigManager(object):
                 conf = plugin.get_config()
                 if conf.modified:
                     self.save_plugin(plugin.name, conf)
-
-    def get_global_config(self):
-        return self._global_config
-
-    def save_global_config(self):
-        self._save_config(self._settings_file, self._global_config)
 
     def _save_config(self, fp, config):
         with open(fp, 'w') as f:
@@ -164,6 +138,9 @@ class PluginConfig(object):
                 del self[key]
 
         return self
+
+    def __len__(self):
+        return len(list(filter(lambda x: x != PluginConfig.GLOBAL_KEY, self._config.keys())))
 
     def set_global_config(self, config):
         self[PluginConfig.GLOBAL_KEY] = config

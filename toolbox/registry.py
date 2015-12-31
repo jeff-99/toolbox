@@ -47,6 +47,8 @@ class Registry(object):
 
         if isinstance(plugin, ConfigMixin):
             config = self.config_manager.load_plugin(plugin.name)
+            if 'config' in self._loaded_plugins:
+                config.set_global_config(self.get_plugin('config').get_config())
             plugin.set_config(config)
 
         return plugin
