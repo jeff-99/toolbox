@@ -72,6 +72,7 @@ class Toolbox(object):
         # prepare main parser
         self.parser.usage = '%(prog)s tool [args]'
         self.parser.description = 'Extendable plugin toolbox'
+        self.parser.add_argument('-v', '--version', help="Toolbox version",action='store_true')
 
         # prepare subparsers
         subparsers = self.parser.add_subparsers(help='Plugins', dest='plugin')
@@ -101,6 +102,10 @@ class Toolbox(object):
         :return:
         """
         parsed_args = self.parser.parse_args(args)
+        if parsed_args.version:
+            import toolbox
+            print(toolbox.__version__)
+            exit()
 
         if parsed_args.plugin is None:
             self.parser.print_help()
