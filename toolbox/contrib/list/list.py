@@ -15,7 +15,7 @@ class ListPlugin(RegistryMixin, ToolboxPlugin):
                             '--external',
                             action='store_true',
                             help='only external plugins')
-        parser.add_argument('search', nargs="?")
+        parser.add_argument('search', nargs="?", help="search query")
 
     def execute(self, args):
         registry = self.get_registry()

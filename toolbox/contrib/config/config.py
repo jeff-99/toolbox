@@ -1,17 +1,19 @@
-__author__ = 'jeff'
-
 from toolbox.plugin import ToolboxPlugin
 from toolbox.mixins import ConfigMixin
 from toolbox.defaults import *
 
 
 class ConfigPlugin(ConfigMixin, ToolboxPlugin):
+    """
+    The Config plugin manages the global configuration of the toolbox.
+    It can be used from the commandline aswell as progamatically by loading it from the registry within an other plugin
+    """
     name = 'config'
     description = 'Config API holds and controls the global config'
 
     def prepare_parser(self, parser):
-        parser.add_argument('method', choices=['set', 'get'])
-        parser.add_argument('attribute', type=str)
+        parser.add_argument('method', choices=['set', 'get'], help="method")
+        parser.add_argument('attribute', type=str, help="config key")
         parser.add_argument('value', nargs='?')
 
     def execute(self, args):

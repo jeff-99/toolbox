@@ -16,10 +16,11 @@ class InstallPlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
                             "--uninstall",
                             action="store_true",
                             help="Uninstall plugin")
-        parser.add_argument("-d",
-                            "--dev",
-                            action='store_true',
-                            help="Install a dev plugin")
+        parser.add_argument(
+            "-d",
+            "--dev",
+            action='store_true',
+            help="Install a dev plugin by symlinking the source")
         parser.add_argument(
             "-e",
             "--external",

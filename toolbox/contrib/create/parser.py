@@ -29,6 +29,12 @@ class Parser(object):
         return value
 
     def _parse_line(self, line):
+        """
+        finds variable names from the provided line and calls the resolve_key method with eventual matches
+        It replaces the match with the resolved value and returns the line
+        :param line:
+        :return:
+        """
         pattern = r'{{(.*?)}}'
         line = re.sub(pattern, self.resolve_key, line)
 
@@ -47,7 +53,13 @@ class Parser(object):
         return "".join(new_data)
 
     def parse(self):
+        """
+        Walk the template dir, read the template files and parse them replacing variables in the files with values
+        given in the context dictionary.
+        Return a list of directories and files with their parsed content basically the output of os.walk.
 
+        :return:
+        """
         dir_content = []
         for cur_path, dirs, files in os.walk(self.template_dir):
 
