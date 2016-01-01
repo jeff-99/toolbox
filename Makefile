@@ -17,6 +17,7 @@ help:
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "clean-test - remove test and coverage artifacts"
 	@echo "lint - check style with flake8"
+	@echo "style - apply yapf code styling"
 	@echo "test - run tests quickly with the default Python"
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python"
@@ -47,6 +48,9 @@ clean-test:
 
 lint:
 	flake8 toolbox tests
+
+style:
+	yapf toolbox/* -i -r
 
 test:
 	python setup.py test
