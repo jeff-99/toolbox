@@ -1,13 +1,14 @@
-import os
 import json
 import collections
 from .mixins import ConfigMixin
 from .defaults import *
-import copy
 
 
 class ConfigManager(object):
-
+    """
+    The config manager has the responsibility of persisting plugin configs.
+    On initialisation it creates a default file structure in the user's home directory
+    """
     FILE_EXT = '.json'
 
     def __init__(self):
@@ -23,6 +24,13 @@ class ConfigManager(object):
         self.config_dir = CONF_DIR
 
     def load_plugin(self, name):
+        """
+        Load the plugin config file by name and return an py:class:`toolbox.config.PluginConfig`
+
+        :param str name:
+        :return: an instance of PluginConfig for given plugin name
+        :rtype: toolbox.config.PluginConfig
+        """
         file_name = name + ConfigManager.FILE_EXT
         path = os.path.join(self.config_dir, file_name)
 
@@ -42,6 +50,14 @@ class ConfigManager(object):
         return plugin_config
 
     def save_plugin(self, name, config):
+        """
+        save a plugin config by name
+        before saving the global config key is deleted
+
+        :param str name: Name of the plugin
+        :param config: instance of an py:class:`toolbox.config.PluginConfig`
+        :return:
+        """
         file_name = name + ConfigManager.FILE_EXT
         path = os.path.join(self.config_dir, file_name)
 
@@ -51,47 +67,27 @@ class ConfigManager(object):
         if PluginConfig.GLOBAL_KEY in config:
             del config[PluginConfig.GLOBAL_KEY]
 
-        self._save_config(path, config)
+        with open(path, 'w') as f:
+            f.write(config.to_json())
 
     def save(self, plugins):
+        """
+        Convenience method to save a list of plugins. Only configs that have been modified since loading will be saved.
+        :param list plugins: list of instances of base class py:class:`toolbox.plugin.ToolboxPlugin`
+        :return:
+        """
         for plugin in plugins:
             if isinstance(plugin, ConfigMixin):
                 conf = plugin.get_config()
                 if conf.modified:
                     self.save_plugin(plugin.name, conf)
 
-    def _save_config(self, fp, config):
-        with open(fp, 'w') as f:
-            f.write(config.to_json())
-
-    def merge_configs(self, base, *args):
-        """
-        Merge config with global configs
-        :param base:
-        :param args:
-        :return:
-        """
-        config = copy.deepcopy(base)
-        for c in args:
-            config = config + c
-        return config
-
-    def remove_config(self, base, *args):
-        """
-        Remove global config variables
-        :param base:
-        :param args:
-        :return:
-        """
-        config = copy.deepcopy(base)
-        for c in args:
-            config = config - c
-
-        return config
-
 
 class PluginConfig(object):
-
+    """
+    Config container for plugin configs. Acts like a dictionary with some extra convenience methods.
+    The config has a special key for global configs which can be accessed with the 'get_global_config' method
+    """
     GLOBAL_KEY = '__GLOBAL__'
 
     def __init__(self):
@@ -152,10 +148,21 @@ class PluginConfig(object):
         return self._config.keys()
 
     def to_json(self):
+        """
+        Converts the config values to a JSON string
+        :return: JSON string
+        :rtype: str
+        """
         return json.dumps(self._config, indent=True)
 
     @classmethod
     def create_from_dict(cls, dict):
+        """
+        Factory method to create a PluginConfig from a python dictionary
+        :param dict:
+        :return: a PluginConfig
+        :rtype: py:class:`toolbox.config.PluginConfig`
+        """
 
         config = cls()
         for k in dict:
