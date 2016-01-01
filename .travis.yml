@@ -22,7 +22,6 @@ deploy:
       NnB6dXErWjRJZ2Y0S1loREVZaWZEZGhiOE1pNTZzbi9SSVh0OFhCb3pkY1ovRnZNSzQ4aVB6OTcx
       Wi83c0RlTmJkd2Z1TVMreE9RdjMyRk8zc004Q2Zqd293MHgxTkJadnpxeGxqYnlLcDBvenNNems9
 env:
-- TOXENV=py35
 - TOXENV=py34
 - TOXENV=py33
 - TOXENV=py27
