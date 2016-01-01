@@ -6,9 +6,9 @@ Installation
 
 At the command line::
 
-    $ easy_install toolbox
+    $ easy_install tool-box
 
 Or, if you have virtualenvwrapper installed::
 
     $ mkvirtualenv toolbox
-    $ pip install toolbox
+    $ pip install tool-box

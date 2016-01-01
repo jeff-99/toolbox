@@ -75,6 +75,14 @@ toolbox.scanner module
     :undoc-members:
     :show-inheritance:
 
+toolbox.utils module
+--------------------
+
+.. automodule:: toolbox.utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

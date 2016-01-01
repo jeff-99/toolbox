@@ -3,20 +3,20 @@ Toolbox
 ===============================
 
 .. image:: https://img.shields.io/pypi/v/toolbox.svg
-        :target: https://pypi.python.org/pypi/toolbox
+        :target: https://pypi.python.org/pypi/tool-box
 
 .. image:: https://img.shields.io/travis/jeff-99/toolbox.svg
         :target: https://travis-ci.org/jeff-99/toolbox
 
 .. image:: https://readthedocs.org/projects/toolbox/badge/?version=latest
-        :target: https://readthedocs.org/projects/toolbox/?badge=latest
+        :target: https://readthedocs.org/projects/tool-box/?badge=latest
         :alt: Documentation Status
 
 
 Extensible toolbox for all your tools
 
 * Free software: ISC license
-* Documentation: https://toolbox.readthedocs.org.
+* Documentation: https://tool-box.readthedocs.org.
 
 Features
 --------
