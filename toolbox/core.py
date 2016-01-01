@@ -5,6 +5,7 @@ from .defaults import TOOLBOX_DIR
 from .registry import Registry, NoPluginException
 from .scanner import find_contrib_modules, find_modules, find_local_modules
 
+
 class UnknownPlugin(Exception):
     pass
 
@@ -20,7 +21,7 @@ class Toolbox(object):
         :param bool local:
         :return:
         """
-    
+
     def __init__(self, external=True, local=True):
         # load core plugins
         modules = find_contrib_modules()
@@ -40,22 +41,27 @@ class Toolbox(object):
             extra_modules += find_modules(global_config.get('toolbox_prefix'))
             extra_modules += global_config.get('external_plugins') or []
         if local:
-            extra_modules += find_local_modules(global_config.get('local_plugin_dir'))
+            extra_modules += find_local_modules(global_config.get(
+                'local_plugin_dir'))
 
         try:
             self.registry.populate(extra_modules)
         except (AttributeError, NoPluginException) as e:
-            print("An external Plugin caused trouble, please uninstall it -- {}".format(e))
+            print(
+                "An external Plugin caused trouble, please uninstall it -- {}".format(
+                    e))
 
-    def _init_logger(self,debug):
+    def _init_logger(self, debug):
         """
         Initialise the main logger
         :param debug:
         :return:
         """
         logger = logging.getLogger('toolbox')
-        handler = FileHandler(os.path.join(TOOLBOX_DIR, 'toolbox.log'), 'w','utf-8')
-        formatter = Formatter(fmt="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+        handler = FileHandler(
+            os.path.join(TOOLBOX_DIR, 'toolbox.log'), 'w', 'utf-8')
+        formatter = Formatter(
+            fmt="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.setLevel(logging.WARNING)
@@ -72,7 +78,10 @@ class Toolbox(object):
         # prepare main parser
         self.parser.usage = '%(prog)s tool [args]'
         self.parser.description = 'Extendable plugin toolbox'
-        self.parser.add_argument('-v', '--version', help="Toolbox version",action='store_true')
+        self.parser.add_argument('-v',
+                                 '--version',
+                                 help="Toolbox version",
+                                 action='store_true')
 
         # prepare subparsers
         subparsers = self.parser.add_subparsers(help='Plugins', dest='plugin')
@@ -86,7 +95,6 @@ class Toolbox(object):
 
             # let the plugin prepare the arguments
             plugin.prepare_parser(plugin_parser)
-
 
     def execute(self, args):
         """
@@ -142,4 +150,3 @@ class Toolbox(object):
             return
 
         self.shutdown()
-

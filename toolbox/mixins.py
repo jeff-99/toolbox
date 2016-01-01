@@ -1,7 +1,7 @@
 __author__ = 'jeff'
 
-class RegistryMixin(object):
 
+class RegistryMixin(object):
 
     _registry = None
 

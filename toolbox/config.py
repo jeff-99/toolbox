@@ -24,7 +24,7 @@ class ConfigManager(object):
 
     def load_plugin(self, name):
         file_name = name + ConfigManager.FILE_EXT
-        path = os.path.join(self.config_dir,file_name)
+        path = os.path.join(self.config_dir, file_name)
 
         if not os.path.exists(path):
             plugin_config = PluginConfig()
@@ -41,10 +41,9 @@ class ConfigManager(object):
 
         return plugin_config
 
-
-    def save_plugin(self,name, config):
+    def save_plugin(self, name, config):
         file_name = name + ConfigManager.FILE_EXT
-        path = os.path.join(self.config_dir,file_name)
+        path = os.path.join(self.config_dir, file_name)
 
         if os.path.exists(path) and not os.path.isfile(path):
             raise Exception('path exists but it ain\'t a file Brah')
@@ -65,7 +64,7 @@ class ConfigManager(object):
         with open(fp, 'w') as f:
             f.write(config.to_json())
 
-    def merge_configs(self,base, *args):
+    def merge_configs(self, base, *args):
         """
         Merge config with global configs
         :param base:
@@ -140,7 +139,8 @@ class PluginConfig(object):
         return self
 
     def __len__(self):
-        return len(list(filter(lambda x: x != PluginConfig.GLOBAL_KEY, self._config.keys())))
+        return len(list(filter(lambda x: x != PluginConfig.GLOBAL_KEY,
+                               self._config.keys())))
 
     def set_global_config(self, config):
         self[PluginConfig.GLOBAL_KEY] = config

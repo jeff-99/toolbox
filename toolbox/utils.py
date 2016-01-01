@@ -1,7 +1,8 @@
 __author__ = 'jeff'
 import random
 
-ADJECTIVES = ["red", "colossal", "rusty", "tiny", "trustworthy", "dirty", "redundant", "cute"]
+ADJECTIVES = ["red", "colossal", "rusty", "tiny", "trustworthy", "dirty",
+              "redundant", "cute"]
 TOOLS = ["hammer", "screwdriver", "pliers", "saw", "knife", "shovel", "shear"]
 
 

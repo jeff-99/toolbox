@@ -4,8 +4,10 @@ from .mixins import RegistryMixin, ConfigMixin, LogMixin
 from .config import ConfigManager
 import importlib, inspect, logging
 
-class NoPluginException (Exception):
+
+class NoPluginException(Exception):
     pass
+
 
 class Registry(object):
     """
@@ -17,6 +19,7 @@ class Registry(object):
     :ivar dict _loaded_plugins: dictionary containing all fully loaded plugins
 
     """
+
     def __init__(self):
         self.config_manager = ConfigManager()
         self._registered_plugins = {}
@@ -33,9 +36,11 @@ class Registry(object):
         :return:
         """
         if not isinstance(plugin, ToolboxPlugin):
-            raise NoPluginException('provided plugin argument does not extend the core ToolboxPlugin class')
+            raise NoPluginException(
+                'provided plugin argument does not extend the core ToolboxPlugin class')
         if not hasattr(plugin, 'name') or plugin.name is None:
-            raise AttributeError('Plugin {} has no name attribute set'.format(plugin))
+            raise AttributeError('Plugin {} has no name attribute set'.format(
+                plugin))
         if not hasattr(plugin, 'description') or plugin.description is None:
             raise AttributeError("Plugin {} has no description".format(plugin))
 
@@ -48,15 +53,16 @@ class Registry(object):
         if isinstance(plugin, ConfigMixin):
             config = self.config_manager.load_plugin(plugin.name)
             if 'config' in self._loaded_plugins:
-                config.set_global_config(self.get_plugin('config').get_config())
+                config.set_global_config(self.get_plugin('config').get_config(
+                ))
             plugin.set_config(config)
 
         if isinstance(plugin, LogMixin):
-            logger = logging.getLogger('toolbox.plugins.{}'.format(plugin.name))
+            logger = logging.getLogger('toolbox.plugins.{}'.format(
+                plugin.name))
             plugin.set_logger(logger)
 
         return plugin
-
 
     def populate(self, modules):
         """
@@ -72,7 +78,7 @@ class Registry(object):
         for module in modules:
             m = importlib.import_module(module)
 
-            if hasattr(m,'Plugin'):
+            if hasattr(m, 'Plugin'):
                 self.add_plugin(m.Plugin)
                 continue
 
@@ -80,8 +86,6 @@ class Registry(object):
                 if 'Plugin' in name:
                     p = plugin_class()
                     self.add_plugin(p)
-
-
 
     def get_plugin_names(self):
         """
@@ -97,7 +101,7 @@ class Registry(object):
         """
         return self._registered_plugins.values()
 
-    def get_plugin(self,name):
+    def get_plugin(self, name):
         """
         fetch a plugin from the registry and load it if it is not loaded already.
 

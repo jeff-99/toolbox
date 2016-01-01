@@ -5,18 +5,32 @@ from toolbox.mixins import ConfigMixin, RegistryMixin
 from toolbox.scanner import find_local_modules
 import pip, os, shutil, inspect, importlib, hashlib
 
-class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
+
+class InstallPlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
 
     name = 'install'
     description = 'Install a toolbox plugin from pypi or git'
 
     def prepare_parser(self, parser):
-        parser.add_argument("-u", "--uninstall", action="store_true", help="Uninstall plugin")
-        parser.add_argument("-d", "--dev", action='store_true', help="Install a dev plugin")
-        parser.add_argument("-e", "--external", action="store_true", help="enable an existing python package as toolbox plugin")
-        parser.add_argument("--disable-only", action="store_true", help="Option to only disable the external module for the toolbox, not uninstall it")
+        parser.add_argument("-u",
+                            "--uninstall",
+                            action="store_true",
+                            help="Uninstall plugin")
+        parser.add_argument("-d",
+                            "--dev",
+                            action='store_true',
+                            help="Install a dev plugin")
+        parser.add_argument(
+            "-e",
+            "--external",
+            action="store_true",
+            help="enable an existing python package as toolbox plugin")
+        parser.add_argument(
+            "--disable-only",
+            action="store_true",
+            help=
+            "Option to only disable the external module for the toolbox, not uninstall it")
         parser.add_argument("package")
-
 
     def execute(self, args):
         if not hasattr(args, 'package'):
@@ -28,15 +42,18 @@ class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
         if os.path.exists(args.package):
 
             src_dir = os.path.abspath(args.package)
-            package_name = args.package.split('/')[-1] if not args.dev else hashlib.md5(src_dir.encode('utf-8')).hexdigest()
+            package_name = args.package.split('/')[
+                -1] if not args.dev else hashlib.md5(src_dir.encode(
+                    'utf-8')).hexdigest()
 
             if command == 'install':
-                self.local_install(src_dir,package_name,args.dev)
+                self.local_install(src_dir, package_name, args.dev)
 
             if command == 'uninstall':
-                self.local_uninstall(package_name,args.dev)
+                self.local_uninstall(package_name, args.dev)
 
-        elif command == 'uninstall' and args.package in find_local_modules(self.get_global_config()['local_plugin_dir']):
+        elif command == 'uninstall' and args.package in find_local_modules(
+                self.get_global_config()['local_plugin_dir']):
             # uninstall local plugins by name
             self.local_uninstall(args.package)
 
@@ -45,7 +62,9 @@ class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
             pip.main([command, args.package])
 
         # check if external flag is set and if any of the installed packages contains the name of the module provided
-        if args.external and any([args.package in package.key for package in pip.get_installed_distributions()]):
+        if args.external and any([args.package in package.key
+                                  for package in
+                                  pip.get_installed_distributions()]):
             config_tool = self.get_registry().get_plugin('config')
             external_plugins = set(config_tool.get('external_plugins') or [])
 
@@ -59,7 +78,7 @@ class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
             config_tool.set('external_plugins', list(external_plugins))
             print(message.format(args.package))
 
-    def local_install(self,src_dir, package_name, dev=False):
+    def local_install(self, src_dir, package_name, dev=False):
         """
         Install a package from source with the given name
         If dev == True a symlink is created instead for development
@@ -75,11 +94,11 @@ class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
             os.symlink(src_dir, dest_dir)
         else:
             try:
-                shutil.copytree(src_dir,dest_dir)
+                shutil.copytree(src_dir, dest_dir)
             except Exception as e:
-                print('Installation of {} failed with : {}'.format(src_dir,e))
+                print('Installation of {} failed with : {}'.format(src_dir, e))
 
-    def local_uninstall(self,package_name, dev=False):
+    def local_uninstall(self, package_name, dev=False):
         """
         Uninstall a locally installed plugin
         If dev == True the symlink is deleted
@@ -96,5 +115,5 @@ class InstallPlugin (RegistryMixin, ConfigMixin, ToolboxPlugin):
             try:
                 shutil.rmtree(dest_dir)
             except Exception as e:
-                print('Installation of {} failed with : {}'.format(dest_dir,e))
-
+                print('Installation of {} failed with : {}'.format(dest_dir,
+                                                                   e))
