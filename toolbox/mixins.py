@@ -2,7 +2,10 @@ __author__ = 'jeff'
 
 
 class RegistryMixin(object):
-
+    """
+    The RegistryMixin provides the plugin with an registry interface.
+    Plugins that subclass this mixin get full access to the toolbox registry so you could use plugins within plugins
+    """
     _registry = None
 
     def set_registry(self, registry):
@@ -13,6 +16,11 @@ class RegistryMixin(object):
 
 
 class ConfigMixin(object):
+    """
+    The ConfigMixin provides the plugin with an persisted py:class:`toolbox.config.PluginConfig` which is basically an
+    expanded python dictionary which contains the plugin config as well as an global config.
+    """
+
     def set_config(self, config):
         self._config = config
 
@@ -24,6 +32,9 @@ class ConfigMixin(object):
 
 
 class LogMixin(object):
+    """
+    The LogMixin provides the plugin with a zero configuration python logger.
+    """
     _logger = None
 
     def set_logger(self, logger):
