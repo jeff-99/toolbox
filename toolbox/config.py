@@ -73,7 +73,7 @@ class ConfigManager(object):
     def save(self, plugins):
         """
         Convenience method to save a list of plugins. Only configs that have been modified since loading will be saved.
-        :param list plugins: list of instances of base class py:class:`toolbox.plugin.ToolboxPlugin`
+        :param iterable plugins: list of instances of base class py:class:`toolbox.plugin.ToolboxPlugin`
         :return:
         """
         for plugin in plugins:
