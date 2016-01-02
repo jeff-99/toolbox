@@ -8,7 +8,7 @@ Toolbox
 .. image:: https://img.shields.io/travis/jeff-99/toolbox.svg
         :target: https://travis-ci.org/jeff-99/toolbox
 
-.. image:: https://readthedocs.org/projects/toolbox/badge/?version=latest
+.. image:: https://readthedocs.org/projects/tool-box/badge/?version=latest
         :target: https://readthedocs.org/projects/tool-box/?badge=latest
         :alt: Documentation Status
 
