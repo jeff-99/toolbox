@@ -1,5 +1,5 @@
 import argparse, logging, os
-from logging import FileHandler
+from logging.handlers import TimedRotatingFileHandler
 from logging import Formatter
 from .defaults import TOOLBOX_DIR
 from .registry import Registry, NoPluginException
@@ -58,8 +58,9 @@ class Toolbox(object):
         :return:
         """
         logger = logging.getLogger('toolbox')
-        handler = FileHandler(
-            os.path.join(TOOLBOX_DIR, 'toolbox.log'), 'w', 'utf-8')
+        handler = TimedRotatingFileHandler(
+            os.path.join(TOOLBOX_DIR, 'toolbox.log'), when='H', interval=1, encoding='utf-8', backupCount=1)
+
         formatter = Formatter(
             fmt="%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
         handler.setFormatter(formatter)
