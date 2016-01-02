@@ -45,6 +45,7 @@ Install the newly created tool as a dev tool by::
 
     tbox install --dev ./example
 
+A custom package or module needs to expose a 'Plugin' variable or class definition suffixed by 'Plugin' in the main namespace
 To check if this worked check if your new tool is listed::
 
     tbox list
