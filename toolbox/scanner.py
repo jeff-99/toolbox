@@ -1,5 +1,5 @@
 __author__ = 'jeff'
-import pip
+import pkgutil
 import re
 import os
 import sys
@@ -52,11 +52,10 @@ def find_modules(prefix=None):
     if prefix is None:
         prefix = ''
 
-    installed_modules = pip.get_installed_distributions()
     modules = []
-    for module in installed_modules:
-        match = re.match(r'{}\w+'.format(prefix), module.key)
+    for module_loader, name, ispkg in pkgutil.iter_modules():
+        match = re.search(re.escape(prefix), name)
         if not match is None:
-            modules.append(module.key)
+            modules.append(name)
 
     return modules
