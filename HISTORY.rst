@@ -2,6 +2,10 @@
 History
 =======
 
+0.6.0 (2016-02-01)
+------------------
+* added pip install of tool dependencies by having an requirements.txt
+
 0.5.0 (2016-01-02)
 ------------------
 

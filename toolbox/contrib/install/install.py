@@ -43,12 +43,12 @@ class InstallPlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
         if os.path.exists(args.package):
 
             src_dir = os.path.abspath(args.package)
-            package_name = args.package.split('/')[
-                -1] if not args.dev else hashlib.md5(src_dir.encode(
+            package_name = args.package.split('/')[-1] if not args.dev else hashlib.md5(src_dir.encode(
                     'utf-8')).hexdigest()
 
             if command == 'install':
                 self.local_install(src_dir, package_name, args.dev)
+                self.install_dependencies(os.path.join(src_dir, 'requirements.txt'))
 
             if command == 'uninstall':
                 self.local_uninstall(package_name, args.dev)
@@ -118,3 +118,7 @@ class InstallPlugin(RegistryMixin, ConfigMixin, ToolboxPlugin):
             except Exception as e:
                 print('Installation of {} failed with : {}'.format(dest_dir,
                                                                    e))
+
+    def install_dependencies(self, path):
+        pip.main(['install','-r', path])
+
