@@ -76,7 +76,11 @@ class Registry(object):
         :return:
         """
         for module in modules:
-            m = importlib.import_module(module)
+            try:
+                m = importlib.import_module(module)
+            except SyntaxError as e:
+               print("module '{}' failed loading with message {}".format(module,e.msg))
+               continue
 
             if hasattr(m, 'Plugin'):
                 self.add_plugin(m.Plugin)
